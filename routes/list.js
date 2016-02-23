@@ -89,4 +89,53 @@ module.exports = function(app){
       });
     }
   });
+
+  app.get('/tag/:tag',function(req,res,next){
+    res.redirect(301,'/tag/'+req.params.tag+'/');
+  });
+
+  app.get('/tag/:tag/',function(req,res,next){
+    if(req.sessionID){
+      var list = new List({
+        pageIndex:1,
+        pageSize:settings.pageSize,
+        queryObj:{"tags":{$elemMatch:{"tag":req.params.tag}}}
+      });
+      var post = new Post({});
+      async.parallel({
+        getPageCount:function(done){
+          list.getCount(function(err,count){
+            if(!(err)&&(count!=0)){
+              done(null,Math.ceil(count/settings.pageSize));
+            }else{
+              done(null);
+            }
+          });
+        },
+        getList:function(done){
+          list.getList(function(err,docs){
+            if(!(err)&&docs){
+              done(null,docs);
+            }else{
+              done(null);
+            }
+          });
+        }
+      },function(asyncErr,asyncResult){
+        if(!asyncErr){
+          res.json({
+            list:asyncResult.getList,
+            pagination:{
+              prefix:"/tag/"+req.params.tag,
+              pageIndex:1,
+              pageCount:asyncResult.getPageCount
+            }
+          });
+        }else{
+          //404
+          res.end();
+        }
+      });
+    }
+  });
 }
