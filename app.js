@@ -5,6 +5,7 @@ var session = require('express-session');
 var settings = require('./settings/settings');
 
 var list_routes = require('./routes/list');
+var article_routes = require('./routes/article');
 var post_routes = require('./routes/post');
 
 var app = express();
@@ -32,6 +33,7 @@ app.use('*',function(req,res,next){
 
 
 list_routes(app);
+article_routes(app);
 post_routes(app);
 
 module.exports = app;
