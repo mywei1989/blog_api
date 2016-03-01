@@ -7,6 +7,7 @@ var settings = require('./settings/settings');
 var list_routes = require('./routes/list');
 var article_routes = require('./routes/article');
 var post_routes = require('./routes/post');
+var info_routes = require('./routes/info');
 
 var app = express();
 app.enable('strict routing');
@@ -35,5 +36,6 @@ app.use('*',function(req,res,next){
 list_routes(app);
 article_routes(app);
 post_routes(app);
+info_routes(app);
 
 module.exports = app;
