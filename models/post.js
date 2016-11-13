@@ -35,6 +35,24 @@ Post.prototype.getAllTag = function(callback){
   });
 };
 
+Post.prototype.getTagCount = function(callback){
+  var that = this;
+  MongoClient.connect(settings.mongoUrl,function(err,db){
+    if(!err){
+      var collection = db.collection('posts');
+      collection.distinct('tags',function(err,docs){
+        db.close();
+        if(err){
+          return callback&&callback(err);
+        }
+        callback&&callback(null,docs.length);
+      });
+    }else{
+      return callback&&callback(err);
+    }
+  });  
+};
+
 Post.prototype.save = function(callback){
   var time = {
     date:this.date,

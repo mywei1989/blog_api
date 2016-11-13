@@ -45,6 +45,49 @@ module.exports = function(app){
     }
   });
 
+  app.get('/getBlogInfo',function(req,res,next){
+    if(req.sessionID){
+      var list = new List({
+        pageIndex:1,
+        pageSize:settings.pageSize,
+        queryObj:{}
+      });
+      var post = new Post({});
+      async.parallel({
+        getArticleCount:function(done){
+          list.getCount(function(err,count){
+            if(!(err)){
+              done(null,count);
+            }else{
+              done(null);
+            }
+          });
+        },
+        getTagCount:function(done){
+          post.getTagCount(function(err,count){
+            if(!err){
+              done(null,count);
+            }else{
+              done(null);
+            }
+          });
+        }
+      },function(asyncErr,asyncResult){
+        if(!asyncErr){
+          res.json({
+            blogInfo:{
+              articleCount:asyncResult.getArticleCount,
+              tagCount:asyncResult.getTagCount
+            }
+          });
+        }else{
+          res.end();
+        }
+      });
+    }else{
+      res.end();
+    }
+  });
 
   app.get('/',function(req,res,next){
     if(req.sessionID){
